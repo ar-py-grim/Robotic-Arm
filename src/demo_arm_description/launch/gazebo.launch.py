@@ -9,7 +9,6 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch.event_handlers import OnProcessExit
 
-
 def generate_launch_description():
     
     arm_description_dir = get_package_share_directory('demo_arm_description')
@@ -84,7 +83,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         output='screen',
-        # arguments=['-d', rviz_config_path]
+        arguments=['-d', rviz_config_path]
     )
 
     return LaunchDescription([
@@ -97,25 +96,21 @@ def generate_launch_description():
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=spawn_robot,
-                on_exit=[joint_state_broadcaster_spawner],
-            )
-        ),
+                on_exit=[joint_state_broadcaster_spawner],)),
+
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=joint_state_broadcaster_spawner,
-                on_exit=[arm_controller_spawner],
-            )
-        ),
+                on_exit=[arm_controller_spawner],)),
+
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=arm_controller_spawner,
-                on_exit=[gripper_controller_spawner],
-            )
-        ),
+                on_exit=[gripper_controller_spawner],)),
+
         RegisterEventHandler(
             event_handler=OnProcessExit(
                 target_action=gripper_controller_spawner,
-                on_exit=[rviz_node],
-            )
-        ),
+                on_exit=[rviz_node],)),
+        
     ])

@@ -14,8 +14,6 @@ def generate_launch_description():
                                         arm_description_dir, 'urdf', 'arm_display.urdf.xacro'
                                      ),
                                       description='Absolute path to robot urdf file')
-    
-    rviz_config_path = os.path.join(arm_description_dir, 'rviz', 'rviz_config.rviz')
 
     robot_description = ParameterValue(Command(['xacro ', LaunchConfiguration('model')]),
                                        value_type=str)
@@ -36,7 +34,6 @@ def generate_launch_description():
         executable='rviz2',
         name='rviz2',
         output='screen',
-        # arguments = ['-d',rviz_config_path]
     )
 
     return LaunchDescription([
