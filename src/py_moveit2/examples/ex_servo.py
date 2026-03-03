@@ -12,7 +12,6 @@ from rclpy.node import Node
 from pymoveit2 import MoveIt2Servo
 from pymoveit2.robots import bot
 
-
 def main():
     rclpy.init()
 

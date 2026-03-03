@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-Example of moving robotic arm to a pose goal.
-`ros2 run pymoveit2 ex_pose_goal.py --ros-args -p position:="[, , ]" -p quat_xyzw:="[, , , ]" -p cartesian:=False`
+Example of moving to a pose goal.
+- ros2 run pymoveit2 ex_pose_goal.py --ros-args -p position:="[0.25, 0.0, 1.0]" -p quat_xyzw:="[0.0, 0.0, 0.0, 1.0]" -p cartesian:=False
 """
 
 from threading import Thread
@@ -12,7 +12,6 @@ from rclpy.node import Node
 from pymoveit2 import MoveIt2
 from pymoveit2.robots import bot
 
-
 def main():
     rclpy.init()
 
@@ -20,8 +19,8 @@ def main():
     node = Node("ex_pose_goal")
 
     # Declare parameters for position and orientation
-    node.declare_parameter("position", [-0.059, 1.577, 1.183])
-    node.declare_parameter("quat_xyzw", [0.065, 0.000, -0.001, 0.998])
+    node.declare_parameter("position", [0.5, 0.0, 0.25])
+    node.declare_parameter("quat_xyzw", [1.0, 0.0, 0.0, 0.0])
     node.declare_parameter("cartesian", False)
 
     # Create callback group that allows execution of callbacks in parallel without restrictions
@@ -30,18 +29,24 @@ def main():
     # Create MoveIt 2 interface
     moveit2 = MoveIt2(
         node=node,
-        joint_names = bot.joint_names(),
-        base_link_name = bot.base_link_name(),
-        end_effector_name = bot.end_effector_name(),
-        group_name = bot.MOVE_GROUP_ARM,
+        joint_names=bot.joint_names(),
+        base_link_name=bot.base_link_name(),
+        end_effector_name=bot.end_effector_name(),
+        group_name=bot.MOVE_GROUP_ARM,
         callback_group=callback_group,
+        follow_joint_trajectory_action_name="arm_controller/follow_joint_trajectory"
     )
 
-    # Spin the node in background thread(s)
+    # Spin the node in background thread(s) and wait a bit for initialization
     executor = rclpy.executors.MultiThreadedExecutor(2)
     executor.add_node(node)
     executor_thread = Thread(target=executor.spin, daemon=True, args=())
     executor_thread.start()
+    node.create_rate(1.0).sleep()
+
+    # Scale down velocity and acceleration of joints (percentage of maximum)
+    moveit2.max_velocity = 0.5
+    moveit2.max_acceleration = 0.5
 
     # Get parameters
     position = node.get_parameter("position").get_parameter_value().double_array_value
@@ -50,11 +55,11 @@ def main():
 
     # Move to pose
     node.get_logger().info(f"Moving to {{position: {list(position)}, quat_xyzw: {list(quat_xyzw)}}}")
-    moveit2.move_to_pose(position=position, quat_xyzw=quat_xyzw, cartesian=cartesian,
-                        frame_id="base_link", target_link="gripper_right",)
+    moveit2.move_to_pose(position=position, quat_xyzw=quat_xyzw, cartesian=cartesian)
     moveit2.wait_until_executed()
 
     rclpy.shutdown()
+    executor_thread.join()
     exit(0)
 
 

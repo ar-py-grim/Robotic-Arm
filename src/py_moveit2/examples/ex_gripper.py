@@ -14,7 +14,6 @@ from rclpy.node import Node
 from pymoveit2 import GripperInterface
 from pymoveit2.robots import bot
 
-
 def main():
     rclpy.init()
 
@@ -22,7 +21,7 @@ def main():
     node = Node("ex_gripper")
 
     # Declare parameter for gripper action
-    node.declare_parameter("action",value = "toggle")
+    node.declare_parameter("action", value="open")
 
     # Create callback group that allows execution of callbacks in parallel without restrictions
     callback_group = ReentrantCallbackGroup()
@@ -30,12 +29,13 @@ def main():
     # Create gripper interface
     gripper_interface = GripperInterface(
         node=node,
-        gripper_joint_names = bot.gripper_joint_names(),
-        open_gripper_joint_positions = bot.OPEN_GRIPPER_JOINT_POSITIONS,
-        closed_gripper_joint_positions = bot.CLOSED_GRIPPER_JOINT_POSITIONS,
-        gripper_group_name = bot.MOVE_GROUP_GRIPPER,
+        gripper_joint_names=bot.gripper_joint_names(),
+        open_gripper_joint_positions=bot.OPEN_GRIPPER_JOINT_POSITIONS,
+        closed_gripper_joint_positions=bot.CLOSED_GRIPPER_JOINT_POSITIONS,
+        gripper_group_name=bot.MOVE_GROUP_GRIPPER,
         callback_group=callback_group,
-        follow_joint_trajectory_action_name= "joint_trajectory_controller/follow_joint_trajectory",
+        follow_joint_trajectory_action_name="gripper_controller/follow_joint_trajectory",
+        skip_planning=True,
     )
 
     # Spin the node in background thread(s) and wait a bit for initialization
@@ -56,12 +56,14 @@ def main():
     if "open" == action:
         gripper_interface.open()
         gripper_interface.wait_until_executed()
+
     elif "close" == action:
         gripper_interface.close()
         gripper_interface.wait_until_executed()
+        
     else:
         period_s = 1.0
-        rate = node.create_rate(1 / period_s)
+        rate = node.create_rate(1/period_s)
         while rclpy.ok():
             gripper_interface()
             gripper_interface.wait_until_executed()
