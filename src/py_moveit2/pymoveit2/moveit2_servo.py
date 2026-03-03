@@ -1,18 +1,12 @@
 from copy import deepcopy
 from typing import Optional, Tuple
-
 from geometry_msgs.msg import TwistStamped
 from rclpy.callback_groups import CallbackGroup
 from rclpy.node import Node
-from rclpy.qos import (
-    QoSDurabilityPolicy,
-    QoSHistoryPolicy,
-    QoSProfile,
-    QoSReliabilityPolicy,
-)
+from rclpy.qos import (QoSDurabilityPolicy, QoSHistoryPolicy,
+                       QoSProfile, QoSReliabilityPolicy)
 from rclpy.task import Future
 from std_srvs.srv import Trigger
-
 
 class MoveIt2Servo:
     """
@@ -79,8 +73,8 @@ class MoveIt2Servo:
         self.__twist_msg.twist.angular.z = angular_speed
 
         # Enable servo immediately, if desired
-        # if enable_at_init:
-        #     self.enable()
+        if enable_at_init:
+            self.enable()
 
     def __del__(self):
         """
@@ -115,18 +109,18 @@ class MoveIt2Servo:
         Input is scaled by `linear_speed` and `angular_speed`, respectively.
         """
 
-        # if not self.is_enabled:
-        #     self._node.get_logger().warn(
-        #         "Command failed because MoveIt Servo is not yet enabled."
-        #     )
-        #     if enable_if_disabled:
-        #         self._node.get_logger().warn(
-        #             f"Calling '{self.__start_service.srv_name}' service to enable MoveIt Servo..."
-        #         )
-        #         if not self.enable():
-        #             return
-        #     else:
-        #         return
+        if not self.is_enabled:
+            self._node.get_logger().warn(
+                "Command failed because MoveIt Servo is not yet enabled."
+            )
+            if enable_if_disabled:
+                self._node.get_logger().warn(
+                    f"Calling '{self.__start_service.srv_name}' service to enable MoveIt Servo..."
+                )
+                if not self.enable():
+                    return
+            else:
+                return
 
         twist_msg = deepcopy(self.__twist_msg)
         twist_msg.header.stamp = self._node.get_clock().now().to_msg()
@@ -136,7 +130,6 @@ class MoveIt2Servo:
         twist_msg.twist.angular.x *= angular[0]
         twist_msg.twist.angular.y *= angular[1]
         twist_msg.twist.angular.z *= angular[2]
-        print(twist_msg)
         self.__twist_pub.publish(twist_msg)
 
     def enable(
