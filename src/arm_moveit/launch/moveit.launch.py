@@ -45,7 +45,7 @@ def generate_launch_description():
     moveit_config = (
         MoveItConfigsBuilder("robotic arm", package_name="arm_moveit")
         .robot_description(file_path=os.path.join(
-            get_package_share_directory("demo_arm_description"),
+            get_package_share_directory("arm_description"),
             "urdf","project.urdf.xacro")
         )
         .robot_description_semantic(file_path=os.path.join(moveit_dir,"config/bot.srdf"))
@@ -84,7 +84,6 @@ def generate_launch_description():
         arguments=["--ros-args", "--log-level", "info"],
     )
 
-    # RViz
     rviz_node = Node(
         package="rviz2",
         executable="rviz2",
