@@ -86,7 +86,7 @@ def main():
     node.get_logger().info("Closing gripper")
     gripper.close()
     gripper.wait_until_executed()
-    node.get_logger().info("Object grasped.")
+    node.get_logger().info("rod grasped")
 
     attach_req = AttachLink.Request()
     attach_req.model1_name = 'roboticarm'
@@ -124,14 +124,14 @@ def main():
     detach_req.link2_name  = 'link'
     detach_client.call(detach_req)
 
-    moveit2.detach_collision_object(id="rod")
-    moveit2.remove_collision_object(id="rod")
-    node.create_rate(1.0).sleep()
-
     node.get_logger().info("Opening gripper")
     gripper.open()
     gripper.wait_until_executed()
-    node.get_logger().info("Rod released.")
+
+    moveit2.detach_collision_object(id="rod")
+    moveit2.remove_collision_object(id="rod")
+    node.create_rate(1.0).sleep()
+    node.get_logger().info("Rod released")
 
     state_req = GetEntityState.Request()
     state_req.name = 'rod'
@@ -139,7 +139,6 @@ def main():
     state_res = model_state_client.call(state_req)
     rod_pos = state_res.state.pose.position
     rod_ori = state_res.state.pose.orientation
-    node.get_logger().info(f"Rod position: x={rod_pos.x:.3f}, y={rod_pos.y:.3f}, z={rod_pos.z:.3f}")
 
     rod_mesh = path.join(assets_path, "rod.stl")
     moveit2.add_collision_mesh(
@@ -169,7 +168,7 @@ def main():
     if not moveit2.wait_until_executed():
         node.get_logger().error("Failed to reach home position")
         rclpy.shutdown(); executor_thread.join(); exit(1)
-    node.get_logger().info("Home reached.")
+    node.get_logger().info("Reached home position")
 
     gripper.close()
     gripper.wait_until_executed()
