@@ -30,6 +30,6 @@ ros2 run py_moveit2 pick_place.py
 ```
 
 ### References
-Pymoveit2 package link: [https://github.com/AndrejOrsula/pymoveit2](https://github.com/AndrejOrsula/pymoveit2/tree/3.1.0) <br />
+Pymoveit2 package: [https://github.com/AndrejOrsula/pymoveit2](https://github.com/AndrejOrsula/pymoveit2/tree/3.1.0) <br />
 Linkattacher package: https://github.com/IFRA-Cranfield/IFRA_LinkAttacher <br/>
 Demo Video: https://youtu.be/84JUgYEGplk 
